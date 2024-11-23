@@ -10,10 +10,8 @@ const Navbar: React.FC = () => {
     const { token: isLoggedIn } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch();
     const Navigate = useNavigate();
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-    const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
     const toggleMobileMenu = () => setShowMobileMenu(!showMobileMenu);
 
     const handleLogout = () => {
@@ -41,7 +39,7 @@ const Navbar: React.FC = () => {
                     </Link>
 
                     {/* Hamburger Menu (Mobile View) */}
-                    <div className="lg:hidden flex items-center" onClick={toggleMobileMenu}>
+                    <div className="lg:hidden flex items-center cursor-pointer" onClick={toggleMobileMenu}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -97,12 +95,11 @@ const Navbar: React.FC = () => {
 
             {/* Mobile Drawer */}
             <div
-                className={`lg:hidden fixed top-0 right-0 w-64 h-full bg-gray-800 text-white transition-transform transform ${
-                    showMobileMenu ? "translate-x-0" : "translate-x-full"
-                } p-4`}
+                className={`lg:hidden fixed top-0 right-0 w-64 h-full bg-gray-800 text-white transition-transform transform ${showMobileMenu ? "translate-x-0" : "translate-x-full"
+                    } p-4`}
             >
                 <div className="flex justify-between items-center mb-6">
-                    <Link to="/" className="text-2xl font-bold">
+                    <Link to="/" onClick={toggleMobileMenu} className="text-2xl font-bold">
                         <img src={Logo} alt="Logo" className="h-12 w-auto" />
                     </Link>
                     <button onClick={toggleMobileMenu} className="text-white">
