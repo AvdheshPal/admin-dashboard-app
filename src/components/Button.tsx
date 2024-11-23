@@ -2,13 +2,14 @@ import React from "react";
 
 interface ButtonProps {
   children: React.ReactNode;
-  variant?: "contained" | "outlined" | "text"; // Button style types
-  color?: "primary" | "secondary" | "danger"; // Color themes
-  size?: "small" | "medium" | "large"; // Button sizes
-  onClick?: () => void; // Click handler
-  disabled?: boolean; // Disabled state
-  loading?: boolean; // Loading state
-  className?: string; // Additional custom styles
+  variant?: "contained" | "outlined" | "text";
+  color?: "primary" | "secondary" | "danger";
+  size?: "small" | "medium" | "large";
+  onClick?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  className?: string;
+  type?: "button" | "submit" | "reset";
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -20,18 +21,19 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   className = "",
+  type = "button",
 }) => {
-  // Define base styles
+
   const baseStyles = "font-medium focus:outline-none rounded-md inline-flex items-center justify-center";
 
-  // Define variant styles
+
   const variantStyles = {
     contained: "shadow bg-opacity-90 text-white",
     outlined: "border-2 bg-transparent",
     text: "bg-transparent",
   };
 
-  // Define color styles
+
   const colorStyles = {
     primary: {
       contained: "bg-blue-600 hover:bg-blue-700",
@@ -50,14 +52,14 @@ const Button: React.FC<ButtonProps> = ({
     },
   };
 
-  // Define size styles
+
   const sizeStyles = {
     small: "px-3 py-1 text-sm",
     medium: "px-4 py-2 text-base",
     large: "px-6 py-3 text-lg",
   };
 
-  // Combine all styles
+
   const combinedStyles = `
     ${baseStyles}
     ${variantStyles[variant]}
@@ -72,6 +74,7 @@ const Button: React.FC<ButtonProps> = ({
       className={combinedStyles}
       onClick={onClick}
       disabled={disabled || loading}
+      type={type}
     >
       {loading ? (
         <span className="flex items-center">
