@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
     };
 
     return (
-        <>
+        <div style={{position : 'relative', zIndex : '1000'}}>
             <nav className="bg-gray-800 text-white">
                 <div className="container mx-auto px-4 flex justify-between items-center h-16">
                     {/* Logo */}
@@ -138,7 +138,7 @@ const Navbar: React.FC = () => {
                     )}
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
