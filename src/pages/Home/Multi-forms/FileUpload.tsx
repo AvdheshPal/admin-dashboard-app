@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDropzone } from "react-dropzone";  // Importing react-dropzone
+import { useDropzone } from "react-dropzone";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { toast } from "sonner";
+import Button from "../../../components/Button";
+import "leaflet/dist/leaflet.css";
 
 interface FileUploadProps {
     onNext: (data: any) => void;
@@ -14,76 +16,81 @@ const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [dropzoneError, setDropzoneError] = useState<string | null>(null);
 
-    // Handle file change (from dropzone or file input)
     const handleFileChange = (newFiles: File[]) => {
         if (newFiles.length + files.length > 5) {
             setDropzoneError("You can upload up to 5 files only.");
         } else {
-            setDropzoneError(null);  // Reset error if file limit is not exceeded
+            setDropzoneError(null);
             setFiles((prevFiles) => {
                 const updatedFiles = [...prevFiles, ...newFiles];
-                setValue("files", updatedFiles); // Register files with react-hook-form
+                setValue("files", updatedFiles);
                 return updatedFiles;
             });
         }
     };
 
-    // Remove file from the list
     const removeFile = (index: number) => {
         const updatedFiles = files.filter((_, i) => i !== index);
         setFiles(updatedFiles);
-        setValue("files", updatedFiles); // Update react-hook-form
-        setDropzoneError(null); // Reset error if files are removed
+        setValue("files", updatedFiles);
+        setDropzoneError(null);
     };
 
     const onSubmit = (data: any) => {
         if (!data?.files || data.files.length === 0) {
-          toast.error('Please select at least 1 file');
-          return;
+            toast.error("Please select at least 1 file");
+            return;
         }
-        
-        console.log(data);
-        onNext(data);
-      };
-      
 
-    // Setting up the dropzone options
+        onNext(data);
+        toast.success("Form Submitted Successfully");
+    };
+
     const { getRootProps, getInputProps } = useDropzone({
         onDrop: (acceptedFiles) => handleFileChange(acceptedFiles),
         accept: {
             "application/pdf": [".pdf"],
+            "image/png": [".png"],
+            "image/jpeg": [".jpg", ".jpeg"],
         },
-        maxFiles: 5,  // Limit to 5 files
+        maxFiles: 5,
     });
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6">
+            {/* Drag-and-Drop Upload Section */}
             <div>
-                <label>File Upload (PNG, PDF; Max 5 files)</label>
+                <label className="text-xl font-semibold">Upload</label>
                 <div
                     {...getRootProps()}
-                    className="w-full p-4 border-2 border-dashed rounded-md text-center cursor-pointer"
+                    className="w-full p-6 mt-5 border-2 border-dashed rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
                 >
-                    <input
-                        {...getInputProps()}
-                    />
-                    <p>Drag & drop files here, or click to select files</p>
+                    <input {...getInputProps()} />
+                    <p className="text-lg">
+                        Drag & drop files or <span className="text-blue-500 underline">Browse</span>
+                    </p>
+                    <p className="text-gray-500 text-sm mt-2">
+                        Supported formats: JPEG, PNG, PDF (Max: 5 files)
+                    </p>
                 </div>
-
-                {dropzoneError && <p className="text-red-500">{dropzoneError}</p>}
+                {dropzoneError && <p className="text-red-500 mt-2">{dropzoneError}</p>}
             </div>
 
+            {/* Upload Progress Section */}
             {files.length > 0 && (
                 <div>
-                    <h4 className="font-semibold">Uploaded Files:</h4>
-                    <div className="flex space-x-4">
+                    <h4 className="font-semibold text-lg mb-2">Uploading - {files.length}/5 files</h4>
+                    <div className="space-y-2">
                         {files.map((file, index) => (
-                            <div key={index} className="flex items-center justify-between bg-gray-200 p-2 rounded-md w-32 h-32">
-                                <span className="text-sm text-ellipsis overflow-hidden">{file.name}</span>
+                            <div
+                                key={index}
+                                className="flex items-center justify-between p-2 bg-green-100 border border-green-400 rounded-lg"
+                            >
+                                <span className="text-sm truncate">{file.name}</span>
                                 <button
                                     type="button"
                                     onClick={() => removeFile(index)}
-                                    className="text-red-500 hover:text-red-700"
+                                    className="text-red-500 hover:text-red-700 font-bold"
                                 >
                                     &times;
                                 </button>
@@ -93,11 +100,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
                 </div>
             )}
 
-            <GeolocationMap />
+            {/* Submit Button */}
+            <Button
+                type="submit"
+                className="w-full"
+            >
+                UPLOAD FILES
+            </Button>
 
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
-                Next
-            </button>
+            <GeolocationMap />
         </form>
     );
 };
@@ -105,37 +116,63 @@ const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
 export default FileUpload;
 
 
-
-
 const GeolocationMap: React.FC = () => {
-    const [location, setLocation] = useState<{ lat: number; lon: number }>({ lat: 0, lon: 0 });
+    const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Get user's geolocation when the component mounts
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
                     setLocation({ lat: latitude, lon: longitude });
+                    setLoading(false);
                 },
                 () => {
-                    setLocation({ lat: 0, lon: 0 });
+                    console.warn("Geolocation not supported or permission denied.");
+                    setLoading(false);
                 }
             );
+        } else {
+            console.warn("Geolocation is not available in this browser.");
+            setLoading(false);
         }
     }, []);
 
+    if (loading) {
+        return <p>Loading your location...</p>;
+    }
+
+    if (!location) {
+        return <p>Unable to fetch your location. Please check your browser settings.</p>;
+    }
+
     return (
-        <div>
-            <h4 className="text-lg font-semibold">Geolocation on Map</h4>
-            <MapContainer center={[location.lat, location.lon] as [number, number]} zoom={13} style={{ height: "300px", width: "100%" }}>
+        <div className="mt-10">
+            <h4 className="text-lg font-semibold mb-2">Geolocation on Map</h4>
+            <MapContainer
+                center={[location.lat, location.lon]}
+                zoom={13}
+                style={{ height: "300px", width: "100%" }}
+            >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <Marker position={[location.lat, location.lon] as [number, number]}>
-                    <Popup>
-                        You are here: {`Lat: ${location.lat}, Long: ${location.lon}`}
-                    </Popup>
-                </Marker>
+                <LocationMarker location={location} />
             </MapContainer>
         </div>
+    );
+};
+
+const LocationMarker: React.FC<{ location: { lat: number; lon: number } }> = ({ location }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.setView([location.lat, location.lon], map.getZoom());
+    }, [location, map]);
+
+    return (
+        <Marker position={[location.lat, location.lon]}>
+            <Popup>
+                You are here: {`Lat: ${location.lat}, Long: ${location.lon}`}
+            </Popup>
+        </Marker>
     );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import Button from "../../../components/Button";
 
 interface BasicDetailsProps {
     onNext: (data: any) => void;
@@ -68,9 +69,9 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext }) => {
                 {errors.phone && <p className="text-red-500">{(errors.phone as any)?.message}</p>}
             </div>
 
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
-                Next
-            </button>
+            <Button type="submit">
+                Submit
+            </Button>
         </form>
     );
 };

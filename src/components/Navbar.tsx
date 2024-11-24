@@ -5,6 +5,7 @@ import Logo from "../assets/admin-logo.png";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../Redux/Store";
 import { clearToken } from "../Redux/features/authSlice";
+import { toast } from "sonner";
 
 const Navbar: React.FC = () => {
     const { token: isLoggedIn } = useSelector((state: RootState) => state.auth);
@@ -15,6 +16,7 @@ const Navbar: React.FC = () => {
     const toggleMobileMenu = () => setShowMobileMenu(!showMobileMenu);
 
     const handleLogout = () => {
+        toast.success('Logout Successfully')
         dispatch(clearToken());
     };
 
