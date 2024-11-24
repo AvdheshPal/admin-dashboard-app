@@ -5,9 +5,17 @@ import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import Layout from "./pages/Layout";
 import NoPage from "./pages/NoPage";
+import { Toaster } from "sonner";
 
 const App: React.FC = () => {
     return (
+        <>
+        <Toaster
+         expand={false}
+         position="top-right"
+         richColors
+         closeButton
+          />
         <Router>
             <Routes>
                 <Route path="/" element={<Layout />}>
@@ -18,6 +26,7 @@ const App: React.FC = () => {
                 <Route path="/login" element={<Login />} />
             </Routes>
         </Router>
+        </>
     );
 };
 

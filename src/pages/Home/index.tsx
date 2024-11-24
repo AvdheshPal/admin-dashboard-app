@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import Stepper from "../components/Stepper";
+import Stepper from "../../components/Stepper";
+import BasicDetails from "./Multi-forms/BasicDetails";
+import Address from "./Multi-forms/Address";
+import FileUpload from "./Multi-forms/FileUpload";
 
 const Home: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
-    "Select campaign settings",
-    "Create an ad group",
-    "Create an ad",
+    "Basic Details",
+    "Address",
+    "File Upload",
   ];
 
   const handleNext = () => {
@@ -22,6 +25,19 @@ const Home: React.FC = () => {
     }
   };
 
+  const renderStepContent = () => {
+    switch (activeStep) {
+      case 0:
+        return <BasicDetails onNext={handleNext} />;
+      case 1:
+        return <Address onNext={handleNext} />;
+      case 2:
+        return <FileUpload onNext={handleNext} />;
+      default:
+        return <div>Unknown Step</div>;
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center p-6">
       <Stepper steps={steps} activeStep={activeStep} />
@@ -32,7 +48,10 @@ const Home: React.FC = () => {
             Form Content for Step {activeStep + 1}: {steps[activeStep]}
           </h3>
           <p className="mt-2 text-sm">Your form fields go here.</p>
+          {/* Render specific step content */}
+          {renderStepContent()}
         </div>
+
         {/* Navigation Buttons */}
         <div className="mt-6 flex justify-between">
           <button
