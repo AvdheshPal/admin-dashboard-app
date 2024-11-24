@@ -5,6 +5,8 @@ import Button from '../components/Button';
 import { useDispatch } from 'react-redux';
 import { setToken } from '../Redux/features/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import axios from 'axios';
 
 interface LoginFormInputs {
     email: string;
@@ -40,6 +42,7 @@ const LoginCard: React.FC<AuthCardProps> = ({ setForgetPassword }) => {
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [loading , setLoading] = useState(false)
 
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
@@ -47,9 +50,25 @@ const LoginCard: React.FC<AuthCardProps> = ({ setForgetPassword }) => {
 
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
-    const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
-        reduxDispatch(setToken(data.email));
-        navigate('/');
+    const onSubmit: SubmitHandler<LoginFormInputs> = async(data) => {
+        setLoading(true)
+        toast.promise(
+            axios.post('https://x8ki-letl-twmt.n7.xano.io/api:IAuUhB5G/auth/login', { ...data }),
+            {
+              loading: 'Logging In...',
+              success: (response) => {
+                setLoading(false)
+                reduxDispatch(setToken(response.data.authToken));
+                navigate('/')
+                return `Login Successfully`;
+              },
+              error: (error) => {
+                setLoading(false)
+                return `Error: ${error?.response?.data?.message || 'Failled to login'}`;
+              },
+            }
+          );
+
     };
 
     return (
@@ -164,6 +183,7 @@ const LoginCard: React.FC<AuthCardProps> = ({ setForgetPassword }) => {
                         variant="contained"
                         color="primary"
                         className="w-full"
+                        loading={loading}
                     >
                         Login
                     </Button>
