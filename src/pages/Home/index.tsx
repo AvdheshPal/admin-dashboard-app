@@ -7,13 +7,13 @@ import FileUpload from "./Multi-forms/FileUpload";
 import FormDone from "./Multi-forms/FormDone";
 import Button from "../../components/Button";
 import { RootState, AppDispatch } from "../../Redux/Store";
-import { nextStep, prevStep, completeStep, resetStepper } from "../../Redux/features/stepperSlice";
-import { resetForm } from "../../Redux/features/formSlice";
+import { nextStep, prevStep, completeStep } from "../../Redux/features/stepperSlice";
+// import { resetForm } from "../../Redux/features/formSlice";
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { activeStep, steps } = useSelector((state: RootState) => state.stepper);
-  const [render, setRender] = useState<number>(2)
+  const [render] = useState<number>(2)
 
   const handleComplete = () => {
     dispatch(completeStep());
@@ -33,11 +33,11 @@ const Home: React.FC = () => {
   const allStepsCompleted = steps.every((step) => step.isCompleted);
 
 
-  const handleResetForm = () => {
-    setRender(p => p + 1)
-    dispatch(resetForm())
-    dispatch(resetStepper())
-  }
+  // const handleResetForm = () => {
+  //   setRender(p => p + 1)
+  //   dispatch(resetForm())
+  //   dispatch(resetStepper())
+  // }
 
   return (
     <div className="w-full flex flex-col items-center p-6">
