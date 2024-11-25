@@ -1,15 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Button from "../../../components/Button";
+import { useDispatch, useSelector } from "react-redux";
+import { setBasicDetails } from "../../../Redux/features/formSlice";
+import { RootState } from "../../../Redux/Store";
 
 interface BasicDetailsProps {
     onNext: (data: any) => void;
 }
 
 const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const { basicDetails } = useSelector((state: RootState) => state.form);
+    const reduxDispatch = useDispatch();
+
+    useEffect(() => {
+        if (basicDetails) {
+            reset(basicDetails)
+        }
+    }, [])
 
     const onSubmit = (data: any) => {
+        reduxDispatch(setBasicDetails(data))
         onNext(data);
     };
 
@@ -19,10 +31,10 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext }) => {
                 <label>Name</label>
                 <input
                     type="text"
-                    {...register("name", { 
+                    {...register("name", {
                         required: "* Name is required",
-                        validate : (value) => value.trim() !== "" || "* Name cannot be empty or just whitespace"
-                     })}
+                        validate: (value) => value.trim() !== "" || "* Name cannot be empty or just whitespace"
+                    })}
                     className="w-full p-2 border rounded-md"
                 />
                 {errors.name && <p className="text-red-500">{(errors.name as any)?.message}</p>}

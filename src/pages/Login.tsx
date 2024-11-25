@@ -7,6 +7,7 @@ import { setToken } from '../Redux/features/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { AppDispatch } from '../Redux/Store';
 
 interface LoginFormInputs {
     email: string;
@@ -38,7 +39,7 @@ const Login: React.FC = () => {
 export default Login;
 
 const LoginCard: React.FC<AuthCardProps> = ({ setForgetPassword }) => {
-    const reduxDispatch = useDispatch();
+    const reduxDispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);

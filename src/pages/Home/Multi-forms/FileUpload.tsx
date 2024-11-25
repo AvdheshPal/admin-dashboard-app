@@ -1,20 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { toast } from "sonner";
 import Button from "../../../components/Button";
-import "leaflet/dist/leaflet.css";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../Redux/Store";
+import { setFilesToRedux } from "../../../Redux/features/formSlice";
 
 interface FileUploadProps {
-    onNext: (data: any) => void;
+    onNext: (data: UploadData) => void;
+}
+
+interface UploadData {
+    files: File[];
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
-    const { handleSubmit, setValue } = useForm();
+    const { handleSubmit, setValue } = useForm<UploadData>();
     const [files, setFiles] = useState<File[]>([]);
     const [dropzoneError, setDropzoneError] = useState<string | null>(null);
+    const reduxFiles = useSelector((state : RootState) => state.form.files)
+    const reduxDispatch = useDispatch();
+
+    useEffect(()=>{
+        if (reduxFiles && reduxFiles.length > 0) {
+            setValue("files", reduxFiles);
+            setFiles(reduxFiles);
+        }
+    },[])
 
     const handleFileChange = (newFiles: File[]) => {
         if (newFiles.length + files.length > 5) {
@@ -36,18 +51,17 @@ const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
         setDropzoneError(null);
     };
 
-    const onSubmit = (data: any) => {
+    const onSubmit: SubmitHandler<UploadData> = (data) => {
         if (!data?.files || data.files.length === 0) {
             toast.error("Please select at least 1 file");
             return;
         }
-
+        reduxDispatch(setFilesToRedux(data.files));
         onNext(data);
-        toast.success("Form Submitted Successfully");
     };
 
     const { getRootProps, getInputProps } = useDropzone({
-        onDrop: (acceptedFiles) => handleFileChange(acceptedFiles),
+        onDrop: handleFileChange,
         accept: {
             "application/pdf": [".pdf"],
             "image/png": [".png"],
@@ -101,10 +115,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
             )}
 
             {/* Submit Button */}
-            <Button
-                type="submit"
-                className="w-full"
-            >
+            <Button type="submit" className="w-full">
                 UPLOAD FILES
             </Button>
 
@@ -114,7 +125,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onNext }) => {
 };
 
 export default FileUpload;
-
 
 const GeolocationMap: React.FC = () => {
     const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);

@@ -1,15 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Button from "../../../components/Button";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../Redux/Store";
+import { setAddress } from "../../../Redux/features/formSlice";
 
 interface AddressProps {
   onNext: (data: any) => void;
 }
 
 const Address: React.FC<AddressProps> = ({ onNext }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { address } = useSelector((state: RootState) => state.form);
+  const reduxDispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (address) {
+      reset(address)
+    }
+  }, [])
 
   const onSubmit = (data: any) => {
+    reduxDispatch(setAddress(data))
     onNext(data);
   };
 
