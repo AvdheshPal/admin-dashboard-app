@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { AppDispatch } from '../Redux/Store';
+import { resetForm } from '../Redux/features/formSlice';
+import { resetStepper } from '../Redux/features/stepperSlice';
 
 interface LoginFormInputs {
     email: string;
@@ -64,6 +66,8 @@ const LoginCard: React.FC<AuthCardProps> = ({ setWidget }) => {
               success: (response) => {
                 setLoading(false)
                 reduxDispatch(setToken(response.data.authToken));
+                reduxDispatch(resetForm());
+                reduxDispatch(resetStepper());
                 navigate('/')
                 return `Login Successfully`;
               },
